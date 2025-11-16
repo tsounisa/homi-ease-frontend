@@ -1,0 +1,251 @@
+/* Color Palette (inspired by a modern, clean aesthetic) */
+:root {
+  --primary-color: #2c3e50; /* Dark Blue/Grey for headers, footers */
+  --secondary-color: #3498db; /* Bright Blue for accents, buttons */
+  --background-color: #ecf0f1; /* Light Grey for general background */
+  --text-color: #2c3e50; /* Dark text */
+  --light-text-color: #ffffff; /* White text for dark backgrounds */
+  --border-color: #bdc3c7; /* Light grey for borders */
+  --success-color: #27ae60; /* Green for success messages */
+  --error-color: #e74c3c; /* Red for error messages */
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.App-header {
+  background-color: var(--primary-color);
+  padding: 20px;
+  color: var(--light-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.App-logo {
+  height: 50px; /* Smaller logo for header */
+  margin-right: 15px;
+  pointer-events: none;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+.App-main {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: var(--light-text-color);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.App-footer {
+  background-color: var(--primary-color);
+  color: var(--light-text-color);
+  padding: 15px;
+  text-align: center;
+  font-size: 0.9em;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* General Button Styling */
+button {
+  background-color: var(--secondary-color);
+  color: var(--light-text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9; /* Darker shade of secondary-color */
+}
+
+button:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+/* Form Styling */
+form div {
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form select {
+  width: calc(100% - 22px); /* Account for padding and border */
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+form input[type="range"] {
+  width: 100%;
+}
+
+/* Message Styling */
+p.error-message {
+  color: var(--error-color);
+  font-weight: bold;
+}
+
+p.success-message {
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+/* Specific styles for big buttons on Dashboard */
+.dashboard-nav-button {
+  display: block;
+  width: 80%;
+  margin: 15px auto;
+  padding: 20px;
+  font-size: 1.5em;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 10px;
+  background-color: var(--secondary-color);
+  color: var(--light-text-color);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-nav-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Styling for Add House/Room forms */
+.add-form-container {
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+  background-color: var(--light-text-color);
+}
+
+.add-form-container h3 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+/* Login Page Specific Styling */
+.login-page-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: var(--light-text-color);
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-page-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+}
+
+/* Dashboard Page Specific Styling */
+.dashboard-page-container {
+  padding: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-header h2 {
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.logout-button {
+  background-color: var(--error-color);
+  padding: 8px 15px;
+  font-size: 0.9em;
+}
+
+.logout-button:hover {
+  background-color: #c0392b; /* Darker red */
+}
+
+.house-list, .device-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+.house-list li, .device-list li {
+  background-color: #f8f8f8;
+  border: 1px solid var(--border-color);
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-nav {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Manage Devices Page Specific Styling */
+.manage-devices-page-container {
+  padding: 20px;
+}
+
+.manage-devices-page-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.device-list .delete-button {
+  background-color: var(--error-color);
+  padding: 5px 10px;
+  font-size: 0.8em;
+}
+
+.device-list .delete-button:hover {
+  background-color: #c0392b;
+}
