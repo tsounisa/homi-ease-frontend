@@ -1,13 +1,13 @@
-/* Color Palette (inspired by a modern, clean aesthetic) */
+/* Color Palette */
 :root {
-  --primary-color: #2c3e50; /* Dark Blue/Grey for headers, footers */
-  --secondary-color: #3498db; /* Bright Blue for accents, buttons */
-  --background-color: #ecf0f1; /* Light Grey for general background */
-  --text-color: #2c3e50; /* Dark text */
-  --light-text-color: #ffffff; /* White text for dark backgrounds */
-  --border-color: #bdc3c7; /* Light grey for borders */
-  --success-color: #27ae60; /* Green for success messages */
-  --error-color: #e74c3c; /* Red for error messages */
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --background-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --light-text-color: #ffffff;
+  --border-color: #bdc3c7;
+  --success-color: #27ae60;
+  --error-color: #e74c3c;
 }
 
 body {
@@ -15,8 +15,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -34,13 +32,12 @@ body {
   color: var(--light-text-color);
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Space between logo and potential nav items */
+  justify-content: space-between;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Logo Adjustment (No Spin, Fixed Height) */
 .App-logo {
-  height: 40px; /* Optimal size for header */
+  height: 40px;
   margin-right: 15px;
   pointer-events: none;
 }
@@ -54,9 +51,9 @@ body {
 .App-main {
   flex-grow: 1;
   padding: 20px;
-  max-width: 1200px;
+  max-width: 800px; /* Περιορίζουμε το πλάτος για να μη δείχνει πολύ απλωμένο */
   margin: 20px auto;
-  width: 95%; /* Responsive width */
+  width: 95%;
   background-color: var(--light-text-color);
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
@@ -69,10 +66,9 @@ body {
   padding: 15px;
   text-align: center;
   font-size: 0.9em;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* --- General Button Styling --- */
+/* --- Buttons --- */
 button {
   background-color: var(--secondary-color);
   color: var(--light-text-color);
@@ -87,7 +83,7 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9; /* Darker shade */
+  background-color: #2980b9;
 }
 
 button:disabled {
@@ -95,7 +91,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* --- Form Styling --- */
+/* --- Forms --- */
 form div {
   margin-bottom: 15px;
 }
@@ -111,7 +107,6 @@ form input[type="email"],
 form input[type="password"],
 form select {
   width: 100%;
-  max-width: 400px;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
@@ -120,25 +115,18 @@ form select {
   background-color: #f9f9f9;
 }
 
-form input[type="range"] {
-  width: 100%;
-  max-width: 400px;
-}
-
-/* --- Dashboard Navigation (Grid Layout) --- */
+/* --- Dashboard Navigation (STABLE VERTICAL LIST) --- */
 .dashboard-nav {
   margin-top: 30px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive Grid */
-  gap: 20px;
+  display: flex;           /* Αλλαγή από Grid σε Flex */
+  flex-direction: column;  /* Κάθετη διάταξη (Stack) */
+  gap: 15px;               /* Απόσταση μεταξύ κουμπιών */
 }
 
 .dashboard-nav-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  font-size: 1.3em;
+  display: block;          /* Πιάνει όλο το πλάτος */
+  padding: 20px;
+  font-size: 1.2em;
   text-align: center;
   text-decoration: none;
   border-radius: 8px;
@@ -146,15 +134,16 @@ form input[type="range"] {
   color: var(--light-text-color);
   transition: all 0.3s ease;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  width: 100%;             /* Βεβαιώνουμε ότι γεμίζει τον χώρο */
+  box-sizing: border-box;
 }
 
 .dashboard-nav-button:hover {
   background-color: #2980b9;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
 }
 
-/* --- Common Page Containers --- */
+/* --- Common Containers --- */
 .login-page-container {
   max-width: 400px;
   margin: 50px auto;
@@ -184,18 +173,20 @@ form input[type="range"] {
   background-color: #c0392b;
 }
 
-/* --- Lists (Houses, Devices) --- */
+/* --- Lists --- */
 .house-list, .device-list {
   list-style: none;
   padding: 0;
   margin-top: 15px;
+  display: flex;           /* Χρησιμοποιούμε Flex Column και εδώ */
+  flex-direction: column;  /* για απόλυτη σταθερότητα */
+  gap: 10px;
 }
 
 .house-list li, .device-list li {
   background-color: #f8f9fa;
   border: 1px solid var(--border-color);
   padding: 15px;
-  margin-bottom: 10px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
@@ -209,7 +200,6 @@ form input[type="range"] {
   margin-top: 0;
 }
 
-/* --- Messages --- */
 .error-message {
   color: var(--error-color);
   background-color: rgba(231, 76, 60, 0.1);
@@ -228,7 +218,6 @@ form input[type="range"] {
   margin: 10px 0;
 }
 
-/* --- Add Form Container --- */
 .add-form-container {
   border: 1px solid var(--border-color);
   padding: 20px;
