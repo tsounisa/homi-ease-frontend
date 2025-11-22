@@ -1,28 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
-import AutomationPage from '../pages/AutomationPage';
 import LightingControlPage from '../pages/LightingControlPage';
+import ManageDevicesPage from '../pages/ManageDevicesPage';
 import AddHouseRoomPage from '../pages/AddHouseRoomPage';
-import ManageDevicesPage from '../pages/ManageDevicesPage'; // Import the new page
-import ProtectedRoute from './ProtectedRoute';
+import AutomationPage from '../pages/AutomationPage';
 
 const AppRouter = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/automations" element={<AutomationPage />} />
-          <Route path="/lighting" element={<LightingControlPage />} />
-          <Route path="/add-house-room" element={<AddHouseRoomPage />} />
-          <Route path="/manage-devices" element={<ManageDevicesPage />} /> {/* New protected route */}
-        </Route>
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/lighting" element={<LightingControlPage />} />
+      <Route path="/manage-devices" element={<ManageDevicesPage />} />
+      <Route path="/add-house-room" element={<AddHouseRoomPage />} />
+      <Route path="/automations" element={<AutomationPage />} />
+    </Routes>
   );
 };
 
