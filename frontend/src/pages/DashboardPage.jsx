@@ -1,13 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getHouses } from '../api/house';
-import { Link } from 'react-router-dom';
-// Removed AddHouseForm and AddRoomForm imports
+import { Link, useNavigate } from 'react-router-dom'; // <-- Import useNavigate
 
 const DashboardPage = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate(); // <-- Hook for navigation
   const [houses, setHouses] = useState([]);
   const [error, setError] = useState('');
+
+  // --- 1. SAFETY CHECK: Redirect if not logged in ---
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const fetchHouses = useCallback(async () => {
     try {
@@ -20,16 +27,23 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchHouses();
-  }, [fetchHouses]);
+    if (user) { // Fetch only if user exists
+      fetchHouses();
+    }
+  }, [fetchHouses, user]);
 
-  // Removed handleHouseAdded and handleRoomAdded as forms are moved
+  // --- 2. LOGOUT HANDLER ---
+  const handleLogout = () => {
+    logout();
+    navigate('/'); // Redirect explicitly to Login page
+  };
 
   return (
     <div className="dashboard-page-container">
       <div className="dashboard-header">
-        <h2>Welcome, {user ? user.name : 'Guest'}!</h2>
-        <button onClick={logout} className="logout-button">Logout</button>
+        {/* Αν για κάποιο λόγο το user είναι null στιγμιαία πριν το redirect, δεν δείχνουμε Guest */}
+        <h2>Welcome, {user?.name}!</h2>
+        <button onClick={handleLogout} className="logout-button">Logout</button>
       </div>
 
       <h3>Your Houses</h3>
@@ -37,21 +51,18 @@ const DashboardPage = () => {
       {houses.length > 0 ? (
         <ul className="house-list">
           {houses.map((house) => (
-            <li key={house._id}>{house.name}</li>
+            <li key={house._id || house.id}>{house.name}</li>
           ))}
         </ul>
       ) : (
         <p>No houses found. Add a new house to get started!</p>
       )}
 
-      {/* Removed AddHouseForm and AddRoomForm */}
-
       <nav className="dashboard-nav">
         <Link to="/automations" className="dashboard-nav-button">Automations</Link>
         <Link to="/lighting" className="dashboard-nav-button">Lighting Control</Link>
         <Link to="/add-house-room" className="dashboard-nav-button">Add House/Room</Link>
-        <Link to="/manage-devices" className="dashboard-nav-button">Manage Devices</Link> {/* New button */}
-        {/* Add more navigation links as needed */}
+        <Link to="/manage-devices" className="dashboard-nav-button">Manage Devices</Link>
       </nav>
     </div>
   );

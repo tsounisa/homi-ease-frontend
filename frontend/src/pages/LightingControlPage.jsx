@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getHouses } from '../api/house';
 import { getRooms } from '../api/room';
-import { getDevices, controlDevice } from '../api/device';
+import { getDevices, updateDevice } from '../api/device'; // <-- FIX: Import updateDevice
 
 const LightingControlPage = () => {
   const [houses, setHouses] = useState([]);
@@ -27,7 +27,7 @@ const LightingControlPage = () => {
       try {
         const data = await getRooms(selectedHouse);
         setRooms(data);
-        setSelectedRoom(''); // Reset room selection when house changes
+        setSelectedRoom('');
       } catch (err) {
         setError('Failed to fetch rooms.');
         console.error(err);
@@ -41,9 +41,8 @@ const LightingControlPage = () => {
     if (selectedRoom) {
       try {
         const data = await getDevices(selectedRoom);
-        console.log('Fetched lights data:', data); // Add this line for debugging
-        // Assuming 'light' is a type of device
-        setLights(data.filter(device => device.type === 'light'));
+        // Φιλτράρουμε μόνο τα switches για τον έλεγχο φωτισμού
+        setLights(data.filter(device => device.type === 'switch'));
       } catch (err) {
         setError('Failed to fetch lights.');
         console.error(err);
@@ -65,43 +64,32 @@ const LightingControlPage = () => {
     fetchLights();
   }, [fetchLights]);
 
-  const handleToggleLight = async (deviceId, currentIsOn) => {
+  const handleToggleLight = async (deviceId, currentStatus) => {
     setMessage('');
     setError('');
     try {
-      const action = currentIsOn ? { isOn: false } : { isOn: true };
-      await controlDevice(deviceId, action);
-      setMessage(`Light ${action.isOn ? 'turned on' : 'turned off'} successfully!`);
-      fetchLights(); // Re-fetch lights to update status
+      // FIX: Το Backend περιμένει string 'ON' ή 'OFF'
+      const newStatus = currentStatus === 'ON' ? 'OFF' : 'ON';
+      await updateDevice(deviceId, { status: newStatus });
+      
+      setMessage(`Light turned ${newStatus} successfully!`);
+      fetchLights(); 
     } catch (err) {
       setError('Failed to control light.');
       console.error(err);
     }
   };
 
-  const handleChangeBrightness = async (deviceId, brightness) => {
-    setMessage('');
-    setError('');
-    try {
-      await controlDevice(deviceId, { brightness: parseInt(brightness) });
-      setMessage(`Light brightness set to ${brightness}% successfully!`);
-      fetchLights(); // Re-fetch lights to update status
-    } catch (err) {
-      setError('Failed to change brightness.');
-      console.error(err);
-    }
-  };
-
   return (
-    <div>
+    <div className="page-container">
       <h2>Lighting Control</h2>
 
-      <div>
+      <div className="form-group">
         <label>Select House:</label>
         <select onChange={(e) => setSelectedHouse(e.target.value)} value={selectedHouse}>
           <option value="">--Select a House--</option>
           {houses.map((house) => (
-            <option key={house._id} value={house._id}>
+            <option key={house.id || house._id} value={house.id || house._id}>
               {house.name}
             </option>
           ))}
@@ -109,12 +97,12 @@ const LightingControlPage = () => {
       </div>
 
       {selectedHouse && (
-        <div>
+        <div className="form-group">
           <label>Select Room:</label>
           <select onChange={(e) => setSelectedRoom(e.target.value)} value={selectedRoom}>
             <option value="">--Select a Room--</option>
             {rooms.map((room) => (
-              <option key={room._id} value={room._id}>
+              <option key={room.id || room._id} value={room.id || room._id}>
                 {room.name}
               </option>
             ))}
@@ -123,35 +111,22 @@ const LightingControlPage = () => {
       )}
 
       {selectedRoom && lights.length > 0 && (
-        <div>
-          <h3>Lights in {rooms.find(r => r._id === selectedRoom)?.name}</h3>
+        <div className="lights-grid">
+          <h3>Lights in {rooms.find(r => (r.id || r._id) === selectedRoom)?.name}</h3>
           {lights.map((light) => (
-            <div key={light._id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
+            <div key={light.id || light._id} className="device-card" style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
               <h4>{light.name}</h4>
-              <p>Status: {light.status.isOn ? 'On' : 'Off'}</p>
-              {light.status.brightness !== undefined && (
-                <p>Brightness: {light.status.brightness}%</p>
-              )}
-              <button onClick={() => handleToggleLight(light._id, light.status.isOn)}>
-                Turn {light.status.isOn ? 'Off' : 'On'}
+              <p>Status: <strong>{light.status}</strong></p>
+              
+              <button onClick={() => handleToggleLight(light.id || light._id, light.status)}>
+                Turn {light.status === 'ON' ? 'OFF' : 'ON'}
               </button>
-              <div>
-                <label>Brightness:</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={light.status.brightness || 0} // Corrected to light.status.brightness
-                  onChange={(e) => handleChangeBrightness(light._id, e.target.value)}
-                />
-                <span>{light.status.brightness || 0}%</span>
-              </div>
             </div>
           ))}
         </div>
       )}
 
-      {selectedRoom && lights.length === 0 && <p>No lights found in this room.</p>}
+      {selectedRoom && lights.length === 0 && <p>No smart switches found in this room.</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {message && <p style={{ color: 'green' }}>{message}</p>}
     </div>
