@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth';
 
@@ -18,8 +18,8 @@ const LoginPage = () => {
       const apiResponse = await loginApi({ email, password });
       
       // 2. Unwrap the data.
-      const { token, user } = apiResponse.data || apiResponse;
-
+      
+      const { token, user } = apiResponse.data.data;
       if (!token) {
         throw new Error('Token not found in response');
       }
