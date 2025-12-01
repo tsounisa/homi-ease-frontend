@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { json, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth';
 
@@ -14,12 +14,13 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      // 1. Get the full response object
+      // apiResponse is ALREADY { token: "...", user: {...} }
       const apiResponse = await loginApi({ email, password });
       
-      // 2. Unwrap the data.
-      
-      const { token, user } = apiResponse.data.data;
+      console.log('Final Payload:', apiResponse); // Debug check
+
+      const { token, user } = apiResponse; // <--- No .data, No .data.data
+
       if (!token) {
         throw new Error('Token not found in response');
       }
