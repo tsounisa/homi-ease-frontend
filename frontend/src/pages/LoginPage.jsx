@@ -14,7 +14,16 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const { token, user } = await loginApi({ email, password });
+      // 1. Get the full response object
+      const apiResponse = await loginApi({ email, password });
+      
+      // 2. Unwrap the data.
+      const { token, user } = apiResponse.data || apiResponse;
+
+      if (!token) {
+        throw new Error('Token not found in response');
+      }
+
       login(user, token);
       navigate('/dashboard');
     } catch (err) {
