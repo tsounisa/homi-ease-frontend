@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - '**'         # Run CI on all branches (feature branches AND main)
-      - '!main'      # Exclude main from the CI push trigger (handled by CD job)
   pull_request:
     branches: [ "main" ] # Required check before merging
 
