@@ -2,33 +2,47 @@ name: Frontend CI/CD
 
 on:
   push:
-    branches: [ "main" ] # Runs after merge (for deployment)
+    branches:
+      - '**'         # Run CI on all branches (feature branches AND main)
+      - '!main'      # Exclude main from the CI push trigger (handled by CD job)
   pull_request:
-    branches: [ "main" ] # Runs before merge (for testing)
+    branches: [ "main" ] # Required check before merging
 
 jobs:
-  test-and-deploy:
+  # 1. CI JOB: Test Phase (The Quality Gate)
+  ci_check:
+    name: Continuous Integration Check
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: '20.x' 
         cache: 'npm'
 
     - name: Install Dependencies
       run: npm install
 
-    # CI PHASE: Runs the dummy test from package.json
+    # Runs the dummy script we configured in package.json
     - name: Run Tests
       run: npm test
 
-    # CD PHASE: Trigger Deploy to Render
-    - name: Deploy to Render
-      if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+  # 2. CD JOB: Deployment Phase (Runs ONLY after CI passes and ONLY on 'main' push)
+  cd_deploy:
+    name: Continuous Deployment to Render
+    runs-on: ubuntu-latest
+    
+    # CRITICAL: This job waits for ci_check to succeed first
+    needs: [ci_check] 
+    
+    # This condition ensures deployment ONLY runs when merging into the main branch
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to Render via Hook
       run: |
         curl -X GET ${{ secrets.RENDER_DEPLOY_HOOK }}
