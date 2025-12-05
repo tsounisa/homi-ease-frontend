@@ -52,23 +52,35 @@ const DashboardPage = () => {
       {error && <p className="error-message">{error}</p>}
       
       {/* 3. Check length safely */}
-      {houses && houses.length > 0 ? (
-        <ul className="house-list">
-          {houses.map((house) => (
-            <li key={house._id || house.id}>
-              {/* Add a link to view rooms inside this house */}
-              <Link to={`/house/${house._id || house.id}`}>{house.name}</Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No houses found. Add a new house to get started!</p>
-      )}
+      {/* Added data-cy="house-list" for E2E testing */}
+      <div data-cy="house-list">
+        {houses && houses.length > 0 ? (
+          <ul className="house-list">
+            {houses.map((house) => (
+              <li key={house._id || house.id}>
+                {/* Add a link to view rooms inside this house */}
+                <Link to={`/house/${house._id || house.id}`}>{house.name}</Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No houses found. Add a new house to get started!</p>
+        )}
+      </div>
 
       <nav className="dashboard-nav">
         <Link to="/automations" className="dashboard-nav-button">Automations</Link>
         <Link to="/lighting" className="dashboard-nav-button">Lighting Control</Link>
-        <Link to="/add-house-room" className="dashboard-nav-button">Add House/Room</Link>
+        
+        {/* CRITICAL UPDATE: Added data-cy="add-house-button" here */}
+        <Link 
+            to="/add-house-room" 
+            className="dashboard-nav-button"
+            data-cy="add-house-button"
+        >
+            Add House/Room
+        </Link>
+        
         <Link to="/manage-devices" className="dashboard-nav-button">Manage Devices</Link>
       </nav>
     </div>
