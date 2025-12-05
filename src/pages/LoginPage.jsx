@@ -14,16 +14,20 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      // apiResponse is ALREADY { token: "...", user: {...} }
-      const apiResponse = await loginApi({ email, password });
+      // 1. request is made
+      const response = await loginApi({ email, password });
       
-      console.log('Final Payload:', apiResponse); // Debug check
+      console.log('Login Response:', response); // Debugging
 
-      const { token, user } = apiResponse; // <--- No .data, No .data.data
-
-      if (!token) {
-        throw new Error('Token not found in response');
+      // 2. We check the structure based on the JSON you provided
+      // Expected: { success: true, message: "...", data: { token: "...", user: {...} } }
+      
+      if (!response.data || !response.data.token) {
+        throw new Error('Login failed: Token missing from response');
       }
+
+      // 3. Extract correct fields
+      const { token, user } = response.data;
 
       login(user, token);
       navigate('/dashboard');

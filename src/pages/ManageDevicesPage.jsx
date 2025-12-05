@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getHouses } from '../api/house';
 import { getRooms } from '../api/room';
-import { getDevices, addDevice, deleteDevice } from '../api/device'; // <-- FIX: Removed getAvailableDevices
+import { getDevices, addDevice, deleteDevice } from '../api/device'; 
 
 const ManageDevicesPage = () => {
   const [houses, setHouses] = useState([]);
@@ -12,30 +12,54 @@ const ManageDevicesPage = () => {
   
   // Form State
   const [deviceName, setDeviceName] = useState('');
-  const [deviceType, setDeviceType] = useState('switch'); // Default type
+  const [deviceType, setDeviceType] = useState('light'); 
   
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const fetchHouses = useCallback(async () => {
     try {
-      const data = await getHouses();
-      setHouses(data);
-      if (data.length > 0 && !selectedHouse) {
-        setSelectedHouse(data[0].id || data[0]._id);
+      const response = await getHouses();
+      
+      // --- FIX START: Handle API Envelope Structure ---
+      let housesData = [];
+      if (Array.isArray(response)) {
+        housesData = response;
+      } else if (response.data && Array.isArray(response.data)) {
+        housesData = response.data;
+      } else if (response.houses && Array.isArray(response.houses)) {
+         housesData = response.houses;
+      }
+      // --- FIX END ---
+
+      setHouses(housesData);
+
+      if (housesData.length > 0 && !selectedHouse) {
+        setSelectedHouse(housesData[0]._id);
       }
     } catch (err) {
       setError('Failed to fetch houses.');
+      console.error(err);
     }
   }, [selectedHouse]);
 
   const fetchRooms = useCallback(async () => {
     if (selectedHouse) {
       try {
-        const data = await getRooms(selectedHouse);
-        setRooms(data);
-        if (data.length > 0) {
-          setSelectedRoom(data[0].id || data[0]._id);
+        const response = await getRooms(selectedHouse);
+        
+        // --- FIX: Apply same check for Rooms just in case ---
+        let roomsData = [];
+        if (Array.isArray(response)) {
+            roomsData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+            roomsData = response.data;
+        }
+        
+        setRooms(roomsData);
+        
+        if (roomsData.length > 0) {
+          setSelectedRoom(roomsData[0]._id);
         } else {
           setSelectedRoom('');
         }
@@ -51,8 +75,17 @@ const ManageDevicesPage = () => {
   const fetchPairedDevices = useCallback(async () => {
     if (selectedRoom) {
       try {
-        const data = await getDevices(selectedRoom);
-        setPairedDevices(data);
+        const response = await getDevices(selectedRoom);
+        
+        // --- FIX: Apply same check for Devices ---
+        let devicesData = [];
+         if (Array.isArray(response)) {
+            devicesData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+            devicesData = response.data;
+        }
+
+        setPairedDevices(devicesData);
       } catch (err) {
         setError('Failed to fetch devices.');
       }
@@ -83,14 +116,36 @@ const ManageDevicesPage = () => {
       return;
     }
 
+    let initialStatus;
+    switch (deviceType) {
+      case 'light':
+        initialStatus = { isOn: false, brightness: 100 };
+        break;
+      case 'thermostat':
+        initialStatus = { temperature: 22, mode: 'cool' }; 
+        break;
+      case 'security':
+        initialStatus = { isArmed: true, isTriggered: false };
+        break;
+      case 'media':
+        initialStatus = { isPlaying: false, volume: 30 };
+        break;
+      default:
+        initialStatus = { isOn: false };
+    }
+
     const deviceData = {
       name: deviceName,
       type: deviceType,
-      status: 'OFF' // Default status for new devices
+      status: initialStatus 
     };
 
     try {
-      const addedDevice = await addDevice(selectedRoom, deviceData);
+      const response = await addDevice(selectedRoom, deviceData);
+      
+      // Handle response wrapper for the newly created device
+      const addedDevice = response.data ? response.data : response;
+
       setMessage(`Device "${addedDevice.name}" added successfully!`);
       setDeviceName('');
       fetchPairedDevices(); 
@@ -102,7 +157,6 @@ const ManageDevicesPage = () => {
 
   const handleDeleteDevice = async (deviceId) => {
     if (!window.confirm('Are you sure you want to delete this device?')) return;
-    
     setMessage('');
     setError('');
     try {
@@ -112,6 +166,15 @@ const ManageDevicesPage = () => {
     } catch (err) {
       setError('Failed to delete device.');
     }
+  };
+
+  const renderStatus = (status) => {
+    if (typeof status === 'object' && status !== null) {
+      return Object.entries(status)
+        .map(([key, val]) => `${key}: ${val}`)
+        .join(', ');
+    }
+    return JSON.stringify(status);
   };
 
   return (
@@ -129,7 +192,7 @@ const ManageDevicesPage = () => {
             <select onChange={(e) => setSelectedHouse(e.target.value)} value={selectedHouse}>
               <option value="">--Select a House--</option>
               {houses.map((house) => (
-                <option key={house.id || house._id} value={house.id || house._id}>
+                <option key={house._id} value={house._id}>
                   {house.name}
                 </option>
               ))}
@@ -141,7 +204,7 @@ const ManageDevicesPage = () => {
             <select onChange={(e) => setSelectedRoom(e.target.value)} value={selectedRoom}>
               <option value="">--Select a Room--</option>
               {rooms.map((room) => (
-                <option key={room.id || room._id} value={room.id || room._id}>
+                <option key={room._id} value={room._id}>
                   {room.name}
                 </option>
               ))}
@@ -162,9 +225,11 @@ const ManageDevicesPage = () => {
           <div style={{ marginBottom: '10px' }}>
             <label>Device Type:</label>
             <select value={deviceType} onChange={(e) => setDeviceType(e.target.value)}>
-              <option value="switch">Switch (Light/Plug)</option>
-              <option value="sensor">Sensor</option>
+              <option value="light">Light</option>
               <option value="thermostat">Thermostat</option>
+              <option value="security">Security (Sensor/Lock)</option>
+              <option value="media">Media</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
@@ -179,9 +244,11 @@ const ManageDevicesPage = () => {
         {pairedDevices.length > 0 ? (
           <ul className="device-list">
             {pairedDevices.map((device) => (
-              <li key={device.id || device._id} style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0', padding: '10px', border: '1px solid #eee' }}>
-                <span><strong>{device.name}</strong> ({device.type}) - Status: {device.status}</span>
-                <button onClick={() => handleDeleteDevice(device.id || device._id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>
+              <li key={device._id} style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0', padding: '10px', border: '1px solid #eee' }}>
+                <span>
+                    <strong>{device.name}</strong> ({device.type}) - {renderStatus(device.status)}
+                </span>
+                <button onClick={() => handleDeleteDevice(device._id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>
                   Delete
                 </button>
               </li>
