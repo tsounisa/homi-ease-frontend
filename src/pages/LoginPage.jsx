@@ -45,7 +45,6 @@ const LoginPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            data-cy="email-input" // <--- ADDED for E2E
           />
         </div>
         <div>
@@ -56,11 +55,10 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            data-cy="password-input" // <--- ADDED for E2E
           />
         </div>
-        {error && <p className="error-message" data-cy="login-error-message">{error}</p>}
-        <button type="submit" data-cy="login-button">Login</button>
+        {error && <p className="error-message">{error}</p>}
+        <button type="submit">Login</button>
       </form>
     </div>
   );
