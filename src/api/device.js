@@ -1,21 +1,27 @@
 import axios from './axios';
 
 export const getDevices = async (roomId) => {
-  return await axios.get(`/rooms/${roomId}/devices`); 
+  const response = await axios.get(`/rooms/${roomId}/devices`);
+  return response.data.data; 
 };
 
 export const getDevice = async (deviceId) => {
-  return await axios.get(`/devices/${deviceId}`);
+  const response = await axios.get(`/devices/${deviceId}`);
+  return response.data.data;
 };
 
 export const addDevice = async (roomId, deviceData) => {
-  return await axios.post(`/rooms/${roomId}/devices`, deviceData);
+  const response = await axios.post(`/rooms/${roomId}/devices`, deviceData);
+  return response.data.data;
 };
 
 export const deleteDevice = async (deviceId) => {
-  return await axios.delete(`/devices/${deviceId}`);
+  const response = await axios.delete(`/devices/${deviceId}`);
+  return response.data.data;
 };
 
 export const updateDevice = async (deviceId, updates) => {
-  return await axios.put(`/devices/${deviceId}`, updates); 
+  // updates example: { status: "ON" } ή { name: "New Name" }
+  const response = await axios.put(`/devices/${deviceId}`, updates); 
+  return response.data.data; 
 };
