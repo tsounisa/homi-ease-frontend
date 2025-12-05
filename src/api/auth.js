@@ -1,17 +1,15 @@
-import axios from './axios';
+import axios from './axios'; // Uses your global unwrapper
 
 export const login = async (credentials) => {
-  const response = await axios.post('/auth/login', credentials);
-  // Επιστρέφουμε το response.data.data επειδή το backend στέλνει { success: true, data: {...} }
-  return response.data.data || response.data; 
+  // Axios interceptor unwraps to: { token, user }
+  return await axios.post('/auth/login', credentials); 
 };
 
 export const register = async (userData) => {
-  const { data } = await axios.post('/auth/register', userData);
-  return data;
+  return await axios.post('/auth/register', userData);
 };
 
 export const getMe = async () => {
-  const { data } = await axios.get('/users/me');
-  return data;
+  // Axios interceptor unwraps to: { ...user... }
+  return await axios.get('/auth/me'); 
 };

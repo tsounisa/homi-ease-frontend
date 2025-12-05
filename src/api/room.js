@@ -1,26 +1,22 @@
 import axios from './axios';
 
 export const getRooms = async (houseId) => {
-  const response = await axios.get(`/houses/${houseId}/rooms`);
-  return response.data.data; // Access the nested 'data' property
+  // axios.js interceptor returns the array of rooms directly
+  return await axios.get(`/houses/${houseId}/rooms`);
 };
 
 export const getRoom = async (roomId) => {
-  const response = await axios.get(`/rooms/${roomId}`);
-  return response.data.data; 
+  return await axios.get(`/rooms/${roomId}`);
 };
 
 export const addRoom = async (houseId, roomData) => {
-  const response = await axios.post(`/houses/${houseId}/rooms`, roomData);
-  return response.data.data;
+  return await axios.post(`/houses/${houseId}/rooms`, roomData);
 };
 
 export const updateRoom = async (roomId, updates) => {
-  const response = await axios.put(`/rooms/${roomId}`, updates);
-  return response.data.data;
+  return await axios.put(`/rooms/${roomId}`, updates);
 };
 
 export const deleteRoom = async (roomId) => {
-  const response = await axios.delete(`/rooms/${roomId}`);
-  return response.data.data;
+  return await axios.delete(`/rooms/${roomId}`);
 };

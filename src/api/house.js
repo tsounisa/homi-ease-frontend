@@ -1,26 +1,21 @@
 import axios from './axios';
 
 export const getHouses = async () => {
-  const response = await axios.get('/houses');
-  return response.data.data; // Access the nested 'data' property
+  return await axios.get('/houses'); 
 };
 
 export const getHouse = async (houseId) => {
-  const response = await axios.get(`/houses/${houseId}`);
-  return response.data.data; 
+  return await axios.get(`/houses/${houseId}`);
 };
 
 export const addHouse = async (houseData) => {
-  const response = await axios.post('/houses', houseData);
-  return response.data.data;
+  return await axios.post('/houses', houseData);
 };
 
 export const updateHouse = async (houseId, updates) => {
-  const response = await axios.put(`/houses/${houseId}`, updates);
-  return response.data.data;
+  return await axios.put(`/houses/${houseId}`, updates);
 };
 
 export const deleteHouse = async (houseId) => {
-  const response = await axios.delete(`/houses/${houseId}`);
-  return response.data.data;
+  return await axios.delete(`/houses/${houseId}`);
 };
