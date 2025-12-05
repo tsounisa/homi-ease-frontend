@@ -3,9 +3,9 @@ name: Frontend CI/CD
 on:
   push:
     branches:
-      - '**'         # Run CI on all branches (feature branches AND main)
+      - '**'         # Run CI on all branches
   pull_request:
-    branches: [ "main" ] # Required check before merging
+    branches: [ "main" ]
 
 jobs:
   # 1. CI JOB: Test Phase (The Quality Gate)
@@ -24,21 +24,42 @@ jobs:
         cache: 'npm'
 
     - name: Install Dependencies
-      run: npm install
+      # REASON: Runs at root because package.json is here
+      run: npm ci
 
-    # Runs the dummy script we configured in package.json
-    - name: Run Tests
+    # 1. RUN UNIT TESTS (Jest)
+    - name: Run Unit Tests
+      # REASON: Runs at root
       run: npm test
+      env:
+        CI: true
 
-  # 2. CD JOB: Deployment Phase (Runs ONLY after CI passes and ONLY on 'main' push)
+    # 2. RUN E2E TESTS (Cypress)
+    - name: Run Cypress E2E Tests
+      run: |
+        # Start the app in the background (&) at root
+        npm start &
+        # Wait for localhost:3000 to be ready before running tests
+        npx wait-on http://localhost:3000
+        # Run Cypress headless at root
+        npm run cypress:run
+      env:
+        # 1. Tell Cypress to test against the local server we just started
+        CYPRESS_BASE_URL: http://localhost:3000
+        
+        # 2. Tell your React App where the REAL Backend is
+        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://homi-ease-backend.onrender.com/' }}
+        
+        # Ensure CI mode is on
+        CI: true
+
+  # 2. CD JOB: Deployment Phase
   cd_deploy:
     name: Continuous Deployment to Render
     runs-on: ubuntu-latest
     
-    # CRITICAL: This job waits for ci_check to succeed first
     needs: [ci_check] 
     
-    # This condition ensures deployment ONLY runs when merging into the main branch
     if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:

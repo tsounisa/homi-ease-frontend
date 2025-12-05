@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getHouses } from '../api/house';
 import { getRooms } from '../api/room';
-import { getDevices, addDevice, deleteDevice } from '../api/device'; // <-- FIX: Removed getAvailableDevices
+import { getDevices, addDevice, deleteDevice } from '../api/device'; 
 
 const ManageDevicesPage = () => {
   const [houses, setHouses] = useState([]);
@@ -12,7 +12,7 @@ const ManageDevicesPage = () => {
   
   // Form State
   const [deviceName, setDeviceName] = useState('');
-  const [deviceType, setDeviceType] = useState('switch'); // Default type
+  const [deviceType, setDeviceType] = useState('switch'); 
   
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -83,10 +83,29 @@ const ManageDevicesPage = () => {
       return;
     }
 
+    // --- SWAGGER CONSISTENCY UPDATE ---
+    // Initialize status based on device type schema
+    let initialStatus;
+    switch (deviceType) {
+      case 'switch':
+        initialStatus = { isOn: false, brightness: 100 };
+        break;
+      case 'thermostat':
+        // Adjust keys if your Swagger uses different names (e.g. currentTemp vs temperature)
+        initialStatus = { temperature: 22, mode: 'cool' }; 
+        break;
+      case 'sensor':
+         // Adjust based on your specific sensor schema
+        initialStatus = { active: true };
+        break;
+      default:
+        initialStatus = 'OFF';
+    }
+
     const deviceData = {
       name: deviceName,
       type: deviceType,
-      status: 'OFF' // Default status for new devices
+      status: initialStatus 
     };
 
     try {
@@ -112,6 +131,21 @@ const ManageDevicesPage = () => {
     } catch (err) {
       setError('Failed to delete device.');
     }
+  };
+
+  // --- RENDERING HELPER ---
+  // Prevents crash when status is an object
+  const renderStatus = (status) => {
+    if (typeof status === 'object' && status !== null) {
+      // Format switch status nicely if keys match
+      if ('isOn' in status) {
+         return `${status.isOn ? 'ON' : 'OFF'} ${status.brightness ? `(${status.brightness}%)` : ''}`;
+      }
+      // Fallback for other objects (thermostat, etc.)
+      return JSON.stringify(status);
+    }
+    // Fallback for legacy string statuses
+    return status;
   };
 
   return (
@@ -180,7 +214,10 @@ const ManageDevicesPage = () => {
           <ul className="device-list">
             {pairedDevices.map((device) => (
               <li key={device.id || device._id} style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0', padding: '10px', border: '1px solid #eee' }}>
-                <span><strong>{device.name}</strong> ({device.type}) - Status: {device.status}</span>
+                <span>
+                    {/* Fixed Rendering Bug here */}
+                    <strong>{device.name}</strong> ({device.type}) - Status: {renderStatus(device.status)}
+                </span>
                 <button onClick={() => handleDeleteDevice(device.id || device._id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>
                   Delete
                 </button>
