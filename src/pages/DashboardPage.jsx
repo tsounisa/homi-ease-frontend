@@ -9,14 +9,27 @@ const DashboardPage = () => {
   const [houses, setHouses] = useState([]);
   const [error, setError] = useState('');
 
-  // 1. REMOVE the "useEffect navigate('/')" block. 
-  // ProtectedRoute ensures we are logged in. 
-  // If user is null here, it just means we are "fetching profile".
-
   const fetchHouses = useCallback(async () => {
     try {
-      const data = await getHouses();
-      setHouses(data || []); // Safety net in case API returns null
+      const response = await getHouses();
+      
+      console.log('Get Houses Response:', response); // Debugging
+
+      // FIX: Handle both Raw Array (Swagger) and Envelope (Actual API) patterns
+      let housesData = [];
+      
+      if (Array.isArray(response)) {
+        // Case 1: API returns [ ... ]
+        housesData = response;
+      } else if (response.data && Array.isArray(response.data)) {
+        // Case 2: API returns { success: true, data: [ ... ] }
+        housesData = response.data;
+      } else if (response.houses && Array.isArray(response.houses)) {
+         // Case 3: Fallback for some backends { houses: [ ... ] }
+         housesData = response.houses;
+      }
+
+      setHouses(housesData); 
     } catch (err) {
       setError('Failed to fetch houses.');
       console.error(err);
@@ -24,7 +37,6 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    // Only fetch houses once we know WHO the user is
     if (user) { 
       fetchHouses();
     }
@@ -35,8 +47,6 @@ const DashboardPage = () => {
     navigate('/'); 
   };
 
-  // 2. Add a Loading State
-  // If we passed ProtectedRoute, but user is null, we are just waiting for data.
   if (!user) {
     return <div className="loading">Loading User Profile...</div>;
   }
@@ -51,19 +61,19 @@ const DashboardPage = () => {
       <h3>Your Houses</h3>
       {error && <p className="error-message">{error}</p>}
       
-      {/* 3. Check length safely */}
-      {houses && houses.length > 0 ? (
-        <ul className="house-list">
-          {houses.map((house) => (
-            <li key={house._id || house.id}>
-              {/* Add a link to view rooms inside this house */}
-              <Link to={`/house/${house._id || house.id}`}>{house.name}</Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No houses found. Add a new house to get started!</p>
-      )}
+      <div>
+        {houses && houses.length > 0 ? (
+          <ul className="house-list">
+            {houses.map((house) => (
+              <li key={house._id}>
+                <Link to={`/houses/${house._id}`}>{house.name}</Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No houses found. Add a new house to get started!</p>
+        )}
+      </div>
 
       <nav className="dashboard-nav">
         <Link to="/automations" className="dashboard-nav-button">Automations</Link>

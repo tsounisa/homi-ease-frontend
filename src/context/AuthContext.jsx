@@ -11,8 +11,15 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       if (token && !user) {
         try {
-          const userData = await getMe(); // Now returns clean user object
-          setUser(userData);
+          const response = await getMe(); // Returns { success: true, data: { ... } }
+          
+          // STRICT SWAGGER ALIGNMENT:
+          if (response.data) {
+             setUser(response.data);
+          } else {
+             // Fallback just in case structure changes
+             setUser(response);
+          }
         } catch (error) {
           console.error('Failed to fetch user', error);
           logout();

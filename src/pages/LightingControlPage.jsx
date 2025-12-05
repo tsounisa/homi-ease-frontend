@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getHouses } from '../api/house';
 import { getRooms } from '../api/room';
-import { getDevices, updateDevice } from '../api/device'; // <-- FIX: Import updateDevice
+import { getDevices, updateDevice } from '../api/device';
 
 const LightingControlPage = () => {
   const [houses, setHouses] = useState([]);
@@ -14,8 +14,19 @@ const LightingControlPage = () => {
 
   const fetchHouses = useCallback(async () => {
     try {
-      const data = await getHouses();
-      setHouses(data);
+      const response = await getHouses();
+      
+      // FIX: Handle API Envelope vs Raw Array
+      let housesData = [];
+      if (Array.isArray(response)) {
+        housesData = response;
+      } else if (response.data && Array.isArray(response.data)) {
+        housesData = response.data;
+      } else if (response.houses && Array.isArray(response.houses)) {
+         housesData = response.houses;
+      }
+      
+      setHouses(housesData);
     } catch (err) {
       setError('Failed to fetch houses.');
       console.error(err);
@@ -25,8 +36,17 @@ const LightingControlPage = () => {
   const fetchRooms = useCallback(async () => {
     if (selectedHouse) {
       try {
-        const data = await getRooms(selectedHouse);
-        setRooms(data);
+        const response = await getRooms(selectedHouse);
+        
+        // FIX: Handle API Envelope vs Raw Array
+        let roomsData = [];
+        if (Array.isArray(response)) {
+          roomsData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          roomsData = response.data;
+        }
+
+        setRooms(roomsData);
         setSelectedRoom('');
       } catch (err) {
         setError('Failed to fetch rooms.');
@@ -40,9 +60,19 @@ const LightingControlPage = () => {
   const fetchLights = useCallback(async () => {
     if (selectedRoom) {
       try {
-        const data = await getDevices(selectedRoom);
-        // Φιλτράρουμε μόνο τα switches για τον έλεγχο φωτισμού
-        setLights(data.filter(device => device.type === 'switch'));
+        const response = await getDevices(selectedRoom);
+        
+        // FIX: Handle API Envelope vs Raw Array
+        let devicesData = [];
+        if (Array.isArray(response)) {
+          devicesData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          devicesData = response.data;
+        }
+
+        // STRICT SWAGGER ALIGNMENT: 
+        // Filter by 'light', not 'switch'. Check swagger "Device" enums.
+        setLights(devicesData.filter(device => device.type === 'light'));
       } catch (err) {
         setError('Failed to fetch lights.');
         console.error(err);
@@ -64,15 +94,20 @@ const LightingControlPage = () => {
     fetchLights();
   }, [fetchLights]);
 
-  const handleToggleLight = async (deviceId, currentStatus) => {
+  const handleToggleLight = async (device) => {
     setMessage('');
     setError('');
+    
+    // STRICT SWAGGER ALIGNMENT:
+    // Status is an object: { isOn: boolean, brightness: number }
+    const currentIsOn = device.status?.isOn || false;
+    const newStatus = { ...device.status, isOn: !currentIsOn };
+
     try {
-      // FIX: Το Backend περιμένει string 'ON' ή 'OFF'
-      const newStatus = currentStatus === 'ON' ? 'OFF' : 'ON';
-      await updateDevice(deviceId, { status: newStatus });
+      // Send updated object, not a string
+      await updateDevice(device._id, { status: newStatus });
       
-      setMessage(`Light turned ${newStatus} successfully!`);
+      setMessage(`Light turned ${!currentIsOn ? 'ON' : 'OFF'} successfully!`);
       fetchLights(); 
     } catch (err) {
       setError('Failed to control light.');
@@ -89,7 +124,8 @@ const LightingControlPage = () => {
         <select onChange={(e) => setSelectedHouse(e.target.value)} value={selectedHouse}>
           <option value="">--Select a House--</option>
           {houses.map((house) => (
-            <option key={house.id || house._id} value={house.id || house._id}>
+            // STRICT SWAGGER ALIGNMENT: Use _id
+            <option key={house._id} value={house._id}>
               {house.name}
             </option>
           ))}
@@ -102,7 +138,7 @@ const LightingControlPage = () => {
           <select onChange={(e) => setSelectedRoom(e.target.value)} value={selectedRoom}>
             <option value="">--Select a Room--</option>
             {rooms.map((room) => (
-              <option key={room.id || room._id} value={room.id || room._id}>
+              <option key={room._id} value={room._id}>
                 {room.name}
               </option>
             ))}
@@ -112,21 +148,27 @@ const LightingControlPage = () => {
 
       {selectedRoom && lights.length > 0 && (
         <div className="lights-grid">
-          <h3>Lights in {rooms.find(r => (r.id || r._id) === selectedRoom)?.name}</h3>
-          {lights.map((light) => (
-            <div key={light.id || light._id} className="device-card" style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-              <h4>{light.name}</h4>
-              <p>Status: <strong>{light.status}</strong></p>
-              
-              <button onClick={() => handleToggleLight(light.id || light._id, light.status)}>
-                Turn {light.status === 'ON' ? 'OFF' : 'ON'}
-              </button>
-            </div>
-          ))}
+          <h3>Lights in {rooms.find(r => r._id === selectedRoom)?.name}</h3>
+          {lights.map((light) => {
+            const isOn = light.status?.isOn || false;
+            return (
+              <div key={light._id} className="device-card" style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
+                <h4>{light.name}</h4>
+                <p>Status: <strong>{isOn ? 'ON' : 'OFF'}</strong></p>
+                
+                <button 
+                  onClick={() => handleToggleLight(light)}
+                  style={{ backgroundColor: isOn ? '#ffcc00' : '#ccc' }}
+                >
+                  Turn {isOn ? 'OFF' : 'ON'}
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {selectedRoom && lights.length === 0 && <p>No smart switches found in this room.</p>}
+      {selectedRoom && lights.length === 0 && <p>No smart lights found in this room.</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {message && <p style={{ color: 'green' }}>{message}</p>}
     </div>
