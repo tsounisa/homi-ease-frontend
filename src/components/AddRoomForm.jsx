@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { addRoom } from '../api/room';
-import { getHouses } from '../api/house'; 
+import { getHouses } from '../api/house'; // To fetch houses for selection
 
 const AddRoomForm = ({ onRoomAdded }) => {
   const [roomName, setRoomName] = useState('');
@@ -12,23 +12,10 @@ const AddRoomForm = ({ onRoomAdded }) => {
   useEffect(() => {
     const fetchHouses = async () => {
       try {
-        const response = await getHouses();
-        
-        // FIX: Handle API Envelope vs Raw Array
-        let housesData = [];
-        if (Array.isArray(response)) {
-          housesData = response;
-        } else if (response.data && Array.isArray(response.data)) {
-          housesData = response.data;
-        } else if (response.houses && Array.isArray(response.houses)) {
-           housesData = response.houses;
-        }
-
-        setHouses(housesData);
-        
-        // Select first house by default if available
-        if (housesData.length > 0) {
-          setSelectedHouse(housesData[0]._id); 
+        const data = await getHouses();
+        setHouses(data);
+        if (data.length > 0) {
+          setSelectedHouse(data[0]._id); // Select the first house by default
         }
       } catch (err) {
         setError('Failed to fetch houses for room creation.');
@@ -47,11 +34,7 @@ const AddRoomForm = ({ onRoomAdded }) => {
       return;
     }
     try {
-      const response = await addRoom(selectedHouse, { name: roomName });
-      
-      // Handle response wrapper if present
-      const newRoom = response.data ? response.data : response;
-
+      const newRoom = await addRoom(selectedHouse, { name: roomName });
       setMessage(`Room "${newRoom.name}" added successfully to the selected house!`);
       setRoomName('');
       if (onRoomAdded) {
