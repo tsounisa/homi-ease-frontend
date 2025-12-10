@@ -22,6 +22,11 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios)/)"
+    ]
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
