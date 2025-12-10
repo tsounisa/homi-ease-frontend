@@ -14,21 +14,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      // 1. request is made
-      const response = await loginApi({ email, password });
-      
-      console.log('Login Response:', response); // Debugging
-
-      // 2. We check the structure based on the JSON you provided
-      // Expected: { success: true, message: "...", data: { token: "...", user: {...} } }
-      
-      if (!response.data || !response.data.token) {
-        throw new Error('Login failed: Token missing from response');
-      }
-
-      // 3. Extract correct fields
-      const { token, user } = response.data;
-
+      const { token, user } = await loginApi({ email, password });
       login(user, token);
       navigate('/dashboard');
     } catch (err) {

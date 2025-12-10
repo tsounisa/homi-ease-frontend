@@ -1,13 +1,13 @@
-/* Color Palette */
+/* Color Palette (inspired by a modern, clean aesthetic) */
 :root {
-  --primary-color: #2c3e50;
-  --secondary-color: #3498db;
-  --background-color: #ecf0f1;
-  --text-color: #2c3e50;
-  --light-text-color: #ffffff;
-  --border-color: #bdc3c7;
-  --success-color: #27ae60;
-  --error-color: #e74c3c;
+  --primary-color: #2c3e50; /* Dark Blue/Grey for headers, footers */
+  --secondary-color: #3498db; /* Bright Blue for accents, buttons */
+  --background-color: #ecf0f1; /* Light Grey for general background */
+  --text-color: #2c3e50; /* Dark text */
+  --light-text-color: #ffffff; /* White text for dark backgrounds */
+  --border-color: #bdc3c7; /* Light grey for borders */
+  --success-color: #27ae60; /* Green for success messages */
+  --error-color: #e74c3c; /* Red for error messages */
 }
 
 body {
@@ -15,6 +15,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -25,39 +27,35 @@ body {
   min-height: 100vh;
 }
 
-/* --- Header Styling --- */
 .App-header {
   background-color: var(--primary-color);
-  padding: 15px 20px;
+  padding: 20px;
   color: var(--light-text-color);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .App-logo {
-  height: 40px;
+  height: 50px; /* Smaller logo for header */
   margin-right: 15px;
   pointer-events: none;
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 1.5em;
+  font-size: 1.8em;
 }
 
-/* --- Main Content --- */
 .App-main {
   flex-grow: 1;
   padding: 20px;
-  max-width: 800px; /* Περιορίζουμε το πλάτος για να μη δείχνει πολύ απλωμένο */
+  max-width: 1200px;
   margin: 20px auto;
-  width: 95%;
   background-color: var(--light-text-color);
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
 }
 
 .App-footer {
@@ -66,9 +64,10 @@ body {
   padding: 15px;
   text-align: center;
   font-size: 0.9em;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Buttons --- */
+/* General Button Styling */
 button {
   background-color: var(--secondary-color);
   color: var(--light-text-color);
@@ -77,13 +76,11 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1em;
-  font-weight: bold;
   transition: background-color 0.3s ease;
-  margin-top: 10px;
 }
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #2980b9; /* Darker shade of secondary-color */
 }
 
 button:disabled {
@@ -91,7 +88,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* --- Forms --- */
+/* Form Styling */
 form div {
   margin-bottom: 15px;
 }
@@ -106,36 +103,41 @@ form input[type="text"],
 form input[type="email"],
 form input[type="password"],
 form select {
-  width: 100%;
+  width: calc(100% - 22px); /* Account for padding and border */
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
   font-size: 1em;
-  box-sizing: border-box;
-  background-color: #f9f9f9;
 }
 
-/* --- Dashboard Navigation (STABLE VERTICAL LIST) --- */
-.dashboard-nav {
-  margin-top: 30px;
-  display: flex;           /* Αλλαγή από Grid σε Flex */
-  flex-direction: column;  /* Κάθετη διάταξη (Stack) */
-  gap: 15px;               /* Απόσταση μεταξύ κουμπιών */
+form input[type="range"] {
+  width: 100%;
 }
 
+/* Message Styling */
+p.error-message {
+  color: var(--error-color);
+  font-weight: bold;
+}
+
+p.success-message {
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+/* Specific styles for big buttons on Dashboard */
 .dashboard-nav-button {
-  display: block;          /* Πιάνει όλο το πλάτος */
+  display: block;
+  width: 80%;
+  margin: 15px auto;
   padding: 20px;
-  font-size: 1.2em;
+  font-size: 1.5em;
   text-align: center;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: var(--secondary-color);
   color: var(--light-text-color);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  width: 100%;             /* Βεβαιώνουμε ότι γεμίζει τον χώρο */
-  box-sizing: border-box;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .dashboard-nav-button:hover {
@@ -143,14 +145,39 @@ form select {
   transform: translateY(-2px);
 }
 
-/* --- Common Containers --- */
+/* Styling for Add House/Room forms */
+.add-form-container {
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+  background-color: var(--light-text-color);
+}
+
+.add-form-container h3 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+/* Login Page Specific Styling */
 .login-page-container {
   max-width: 400px;
   margin: 50px auto;
   padding: 30px;
-  border: 1px solid var(--border-color);
+  background-color: var(--light-text-color);
   border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+
+.login-page-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+}
+
+/* Dashboard Page Specific Styling */
+.dashboard-page-container {
+  padding: 20px;
 }
 
 .dashboard-header {
@@ -162,66 +189,63 @@ form select {
   border-bottom: 1px solid var(--border-color);
 }
 
+.dashboard-header h2 {
+  color: var(--primary-color);
+  margin: 0;
+}
+
 .logout-button {
   background-color: var(--error-color);
   padding: 8px 15px;
   font-size: 0.9em;
-  margin-top: 0;
 }
 
 .logout-button:hover {
-  background-color: #c0392b;
+  background-color: #c0392b; /* Darker red */
 }
 
-/* --- Lists --- */
 .house-list, .device-list {
   list-style: none;
   padding: 0;
   margin-top: 15px;
-  display: flex;           /* Χρησιμοποιούμε Flex Column και εδώ */
-  flex-direction: column;  /* για απόλυτη σταθερότητα */
-  gap: 10px;
 }
 
 .house-list li, .device-list li {
-  background-color: #f8f9fa;
+  background-color: #f8f8f8;
   border: 1px solid var(--border-color);
-  padding: 15px;
+  padding: 10px 15px;
+  margin-bottom: 8px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.dashboard-nav {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Manage Devices Page Specific Styling */
+.manage-devices-page-container {
+  padding: 20px;
+}
+
+.manage-devices-page-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  text-align: center;
+}
+
 .device-list .delete-button {
   background-color: var(--error-color);
   padding: 5px 10px;
   font-size: 0.8em;
-  margin-top: 0;
 }
 
-.error-message {
-  color: var(--error-color);
-  background-color: rgba(231, 76, 60, 0.1);
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.success-message {
-  color: var(--success-color);
-  background-color: rgba(39, 174, 96, 0.1);
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.add-form-container {
-  border: 1px solid var(--border-color);
-  padding: 20px;
-  margin-bottom: 30px;
-  border-radius: 8px;
-  background-color: #fafafa;
+.device-list .delete-button:hover {
+  background-color: #c0392b;
 }

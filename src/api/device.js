@@ -1,21 +1,26 @@
 import axios from './axios';
 
 export const getDevices = async (roomId) => {
-  return await axios.get(`/rooms/${roomId}/devices`); 
+  const response = await axios.get(`/rooms/${roomId}/devices`);
+  return response.data.data; // Access the nested 'data' property
 };
 
-export const getDevice = async (deviceId) => {
-  return await axios.get(`/devices/${deviceId}`);
+export const getAvailableDevices = async () => {
+  const response = await axios.get('/devices/available');
+  return response.data.data;
 };
 
 export const addDevice = async (roomId, deviceData) => {
-  return await axios.post(`/rooms/${roomId}/devices`, deviceData);
+  const response = await axios.post(`/rooms/${roomId}/devices`, deviceData);
+  return response.data.data;
 };
 
 export const deleteDevice = async (deviceId) => {
-  return await axios.delete(`/devices/${deviceId}`);
+  const response = await axios.delete(`/devices/${deviceId}`);
+  return response.data.data;
 };
 
-export const updateDevice = async (deviceId, updates) => {
-  return await axios.put(`/devices/${deviceId}`, updates); 
+export const controlDevice = async (deviceId, action) => {
+  const response = await axios.post(`/devices/${deviceId}/action`, action); // Send action directly
+  return response.data.data; // Access the nested 'data' property
 };

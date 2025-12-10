@@ -9,25 +9,19 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (token && !user) {
+      if (token) {
         try {
-          const response = await getMe(); // Returns { success: true, data: { ... } }
-          
-          // STRICT SWAGGER ALIGNMENT:
-          if (response.data) {
-             setUser(response.data);
-          } else {
-             // Fallback just in case structure changes
-             setUser(response);
-          }
+          const userData = await getMe();
+          setUser(userData.data);
         } catch (error) {
           console.error('Failed to fetch user', error);
+          // Token might be invalid, so log out
           logout();
         }
       }
     };
     fetchUser();
-  }, [token, user]);
+  }, [token]);
 
   const login = (userData, authToken) => {
     setUser(userData);

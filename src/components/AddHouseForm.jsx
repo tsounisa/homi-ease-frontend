@@ -11,14 +11,9 @@ const AddHouseForm = ({ onHouseAdded }) => {
     setMessage('');
     setError('');
     try {
-      // STRICT SWAGGER ALIGNMENT:
-      // Request Body: { name: string }
-      // Response: House object ({ _id, name, userId })
       const newHouse = await addHouse({ name: houseName });
-      
       setMessage(`House "${newHouse.name}" added successfully!`);
       setHouseName('');
-      
       if (onHouseAdded) {
         onHouseAdded(newHouse);
       }
