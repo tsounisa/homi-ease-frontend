@@ -29,6 +29,13 @@ jobs:
     - name: Build App
       run: npm run build
 
+     - name: Run E2E Tests (Cypress)
+      uses: cypress-io/github-action@v6
+      with:
+      start: npm start
+      wait-on: 'http://localhost:3000'
+
+
     # Optional: Runs standard unit tests (if any)
     - name: Run Unit Tests
       run: npm test
